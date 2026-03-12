@@ -23,14 +23,14 @@ function App() {
   const addTask = async () => {
 
     if (!title) {
-      alert("Please enter task name")
+      alert("Enter task name")
       return
     }
 
     await axios.post(API + "/tasks", {
-      title: title,
-      category: category,
-      priority: priority,
+      title,
+      category,
+      priority,
       status: "Pending"
     })
 
@@ -52,69 +52,118 @@ function App() {
     fetchTasks()
   }
 
+  const pending = tasks.filter(t => t.status === "Pending")
+  const completed = tasks.filter(t => t.status === "Completed")
+
   return (
 
-    <div style={{ padding: "40px", fontFamily: "Arial" }}>
+    <div className="container">
 
       <h1>Smart Task Board</h1>
 
-      <input
-        placeholder="Task name"
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-      />
+      <div className="add-box">
 
-      <select
-        value={category}
-        onChange={(e) => setCategory(e.target.value)}
-      >
-        <option>Work</option>
-        <option>Personal</option>
-        <option>Study</option>
-      </select>
+        <input
+          placeholder="Task name"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+        />
 
-      <select
-        value={priority}
-        onChange={(e) => setPriority(e.target.value)}
-      >
-        <option>High</option>
-        <option>Medium</option>
-        <option>Low</option>
-      </select>
+        <select
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+        >
+          <option>Work</option>
+          <option>Personal</option>
+          <option>Study</option>
+        </select>
 
-      <button onClick={addTask}>Add</button>
+        <select
+          value={priority}
+          onChange={(e) => setPriority(e.target.value)}
+        >
+          <option>High</option>
+          <option>Medium</option>
+          <option>Low</option>
+        </select>
 
-      <hr />
+        <button onClick={addTask}>Add</button>
 
-      {tasks.map((t) => (
+      </div>
 
-        <div key={t._id} style={{ margin: "10px" }}>
+      <div className="board">
 
-          <b>{t.title}</b> | {t.category} |
+        <div className="column">
 
-          <span
-            style={{
-              color:
-                t.priority === "High"
-                  ? "red"
-                  : t.priority === "Medium"
-                    ? "orange"
-                    : "green"
-            }}
-          >
-            {t.priority}
-          </span>
+          <h2>Pending</h2>
 
-          <button
-            onClick={() => toggleStatus(t)}
-            style={{ marginLeft: "10px" }}
-          >
-            {t.status}
-          </button>
+          {pending.map(t => (
+            <div className="card" key={t._id}>
+
+              <div className="title">{t.title}</div>
+
+              <div className="meta">
+                <span>{t.category}</span>
+
+                <span className={
+                  t.priority === "High"
+                    ? "high"
+                    : t.priority === "Medium"
+                      ? "medium"
+                      : "low"
+                }>
+                  {t.priority}
+                </span>
+              </div>
+
+              <button
+                className="done-btn"
+                onClick={() => toggleStatus(t)}
+              >
+                Complete
+              </button>
+
+            </div>
+          ))}
 
         </div>
 
-      ))}
+        <div className="column">
+
+          <h2>Completed</h2>
+
+          {completed.map(t => (
+            <div className="card done" key={t._id}>
+
+              <div className="title">{t.title}</div>
+
+              <div className="meta">
+                <span>{t.category}</span>
+
+                <span className={
+                  t.priority === "High"
+                    ? "high"
+                    : t.priority === "Medium"
+                      ? "medium"
+                      : "low"
+                }>
+                  {t.priority}
+                </span>
+              </div>
+
+              <button
+                className="undo-btn"
+                onClick={() => toggleStatus(t)}
+              >
+                Undo
+              </button>
+
+            </div>
+          ))}
+
+        </div>
+
+      </div>
 
     </div>
 
