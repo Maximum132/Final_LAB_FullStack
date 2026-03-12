@@ -6,168 +6,198 @@ const API = "https://final-lab-fullstack.onrender.com"
 
 function App() {
 
-  const [tasks, setTasks] = useState([])
-  const [title, setTitle] = useState("")
-  const [category, setCategory] = useState("Work")
-  const [priority, setPriority] = useState("Medium")
+const [tasks, setTasks] = useState([])
+const [title, setTitle] = useState("")
+const [category, setCategory] = useState("Work")
+const [priority, setPriority] = useState("Medium")
+const [filter, setFilter] = useState("All")
 
-  const fetchTasks = async () => {
-    const res = await axios.get(API + "/tasks")
-    setTasks(res.data)
-  }
+const fetchTasks = async () => {
+const res = await axios.get(API + "/tasks")
+setTasks(res.data)
+}
 
-  useEffect(() => {
-    fetchTasks()
-  }, [])
+useEffect(() => {
+fetchTasks()
+}, [])
 
-  const addTask = async () => {
+const addTask = async () => {
 
-    if (!title) {
-      alert("Enter task name")
-      return
-    }
 
-    await axios.post(API + "/tasks", {
-      title,
-      category,
-      priority,
-      status: "Pending"
-    })
+if (!title) {
+  alert("Enter task name")
+  return
+}
 
-    setTitle("")
-    fetchTasks()
-  }
+await axios.post(API + "/tasks", {
+  title,
+  category,
+  priority,
+  status: "Pending"
+})
 
-  const toggleStatus = async (task) => {
+setTitle("")
+fetchTasks()
 
-    const newStatus =
-      task.status === "Pending"
-        ? "Completed"
-        : "Pending"
 
-    await axios.put(API + "/tasks/" + task._id, {
-      status: newStatus
-    })
+}
 
-    fetchTasks()
-  }
+const toggleStatus = async (task) => {
 
-  const pending = tasks.filter(t => t.status === "Pending")
-  const completed = tasks.filter(t => t.status === "Completed")
 
-  return (
+const newStatus =
+  task.status === "Pending"
+    ? "Completed"
+    : "Pending"
 
-    <div className="container">
+await axios.put(API + "/tasks/" + task._id, {
+  status: newStatus
+})
 
-      <h1>Smart Task Board</h1>
+fetchTasks()
 
-      <div className="add-box">
 
-        <input
-          placeholder="Task name"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-        />
+}
 
-        <select
-          value={category}
-          onChange={(e) => setCategory(e.target.value)}
-        >
-          <option>Work</option>
-          <option>Personal</option>
-          <option>Study</option>
-        </select>
+const filteredTasks =
+filter === "All"
+? tasks
+: tasks.filter(t => t.category === filter)
 
-        <select
-          value={priority}
-          onChange={(e) => setPriority(e.target.value)}
-        >
-          <option>High</option>
-          <option>Medium</option>
-          <option>Low</option>
-        </select>
+const pending = filteredTasks.filter(t => t.status === "Pending")
+const completed = filteredTasks.filter(t => t.status === "Completed")
 
-        <button onClick={addTask}>Add</button>
+return (
 
-      </div>
 
-      <div className="board">
+<div className="container">
 
-        <div className="column">
+  <h1>Smart Task Board</h1>
 
-          <h2>Pending</h2>
+  <div className="add-box">
 
-          {pending.map(t => (
-            <div className="card" key={t._id}>
+    <input
+      placeholder="Task name"
+      value={title}
+      onChange={(e) => setTitle(e.target.value)}
+    />
 
-              <div className="title">{t.title}</div>
+    <select
+      value={category}
+      onChange={(e) => setCategory(e.target.value)}
+    >
+      <option>Work</option>
+      <option>Personal</option>
+      <option>Study</option>
+    </select>
 
-              <div className="meta">
-                <span>{t.category}</span>
+    <select
+      value={priority}
+      onChange={(e) => setPriority(e.target.value)}
+    >
+      <option>High</option>
+      <option>Medium</option>
+      <option>Low</option>
+    </select>
 
-                <span className={
-                  t.priority === "High"
-                    ? "high"
-                    : t.priority === "Medium"
-                      ? "medium"
-                      : "low"
-                }>
-                  {t.priority}
-                </span>
-              </div>
+    <button onClick={addTask}>Add</button>
 
-              <button
-                className="done-btn"
-                onClick={() => toggleStatus(t)}
-              >
-                Complete
-              </button>
+  </div>
 
-            </div>
-          ))}
+  <div style={{marginBottom:"20px"}}>
 
-        </div>
+    <label>Filter : </label>
 
-        <div className="column">
+    <select
+      value={filter}
+      onChange={(e)=>setFilter(e.target.value)}
+    >
+      <option value="All">All</option>
+      <option value="Work">Work</option>
+      <option value="Personal">Personal</option>
+      <option value="Study">Study</option>
+    </select>
 
-          <h2>Completed</h2>
+  </div>
 
-          {completed.map(t => (
-            <div className="card done" key={t._id}>
+  <div className="board">
 
-              <div className="title">{t.title}</div>
+    <div className="column">
 
-              <div className="meta">
-                <span>{t.category}</span>
+      <h2>Pending</h2>
 
-                <span className={
-                  t.priority === "High"
-                    ? "high"
-                    : t.priority === "Medium"
-                      ? "medium"
-                      : "low"
-                }>
-                  {t.priority}
-                </span>
-              </div>
+      {pending.map(t => (
+        <div className="card" key={t._id}>
 
-              <button
-                className="undo-btn"
-                onClick={() => toggleStatus(t)}
-              >
-                Undo
-              </button>
+          <div className="title">{t.title}</div>
 
-            </div>
-          ))}
+          <div className="meta">
+            <span>{t.category}</span>
+
+            <span className={
+              t.priority === "High"
+                ? "high"
+                : t.priority === "Medium"
+                  ? "medium"
+                  : "low"
+            }>
+              {t.priority}
+            </span>
+          </div>
+
+          <button
+            className="done-btn"
+            onClick={() => toggleStatus(t)}
+          >
+            Complete
+          </button>
 
         </div>
-
-      </div>
+      ))}
 
     </div>
 
-  )
+    <div className="column">
+
+      <h2>Completed</h2>
+
+      {completed.map(t => (
+        <div className="card done" key={t._id}>
+
+          <div className="title">{t.title}</div>
+
+          <div className="meta">
+            <span>{t.category}</span>
+
+            <span className={
+              t.priority === "High"
+                ? "high"
+                : t.priority === "Medium"
+                  ? "medium"
+                  : "low"
+            }>
+              {t.priority}
+            </span>
+          </div>
+
+          <button
+            className="undo-btn"
+            onClick={() => toggleStatus(t)}
+          >
+            Undo
+          </button>
+
+        </div>
+      ))}
+
+    </div>
+
+  </div>
+
+</div>
+
+
+)
 }
 
 export default App
